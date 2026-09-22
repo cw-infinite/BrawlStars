@@ -1,0 +1,34 @@
+import { useEffect, useRef } from 'react';
+import { startGame } from './game/engine';
+import type { Game } from './game/engine';
+
+export default function App() {
+  const gameRef = useRef<Game | null>(null);
+
+  useEffect(() => {
+    // Boot the arena once the markup is mounted.
+    const game = startGame();
+    gameRef.current = game;
+    return () => {
+      game?.dispose();
+      gameRef.current = null;
+    };
+  }, []);
+
+  return (
+    <>
+      <div id="viewport"></div><canvas id="celebration" aria-hidden="true"></canvas><div id="vignette"></div><div id="event-banner" role="status"></div><div id="safety-arrow">▲<small>SAFE ZONE</small></div><div id="big-hp"></div><div id="damage-direction" aria-hidden="true">▲</div><button id="watch-end" hidden>Back to results</button><div id="hit-flash"></div><div id="touch-controls"><div id="move-stick" className="stick" aria-label="Movement joystick"><span></span><b>MOVE</b></div><div id="aim-stick" className="stick" aria-label="Aim joystick: drag and release to fire, tap to auto-aim"><span></span><b>AIM / FIRE</b></div><button id="touch-super" aria-label="Super: drag to aim, release to fire">✦<small>SUPER</small></button></div>
+      <div id="ui">
+       <header><div className="brand"><div className="emblem">✦</div><div><h1>DUST<span>UP</span></h1><small>A LITTLE ARENA. BIG TROUBLE.</small></div></div><div className="top-right"><div className="pill"><span className="dot"></span><span id="match-status">SOLO SHOWDOWN</span></div><button id="mute" className="setting" aria-label="Mute audio" aria-pressed="false" title="Mute (M)">SFX ON</button><select id="quality" className="setting" aria-label="Graphics quality"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select><button id="pause" aria-label="Pause game" title="Pause (P)">Ⅱ</button></div></header>
+       <aside className="side panel"><div className="eyebrow">06 / 06 · DUSTUP</div><h2>Pick your fighting style.</h2><p>Four brawlers. Four signature supers.<br />Deal damage, charge up, then make your move.</p><div className="divider"></div><div className="check"><b>✓</b> Four distinct brawlers</div><div className="check"><b>✓</b> Damage-charged supers</div><div className="check"><b>✓</b> Hold Space to aim a super</div><p className="range-report" id="range-report">8 BRAWLERS READY</p><p className="next">TOON EDITION</p></aside>
+       <aside className="map"><div className="map-label"><span>THE BADLANDS</span><span>↗</span></div><canvas id="minimap" width="176" height="176"></canvas><div className="map-foot">44 × 44 &nbsp; / &nbsp; SEED <span id="seed"></span></div></aside>
+       <div id="super-hud"><div id="super-status">SUPER · 0%</div><div className="super-meter"><b id="super-fill"></b></div><small>Hold Space / right-click · release to fire</small></div><div id="gas-status" role="status">GAS IN 26s</div><div id="gas-warning">POISON GAS · GET TO SAFETY</div><div id="hint">WASD to move · Mouse to aim · Click to fire</div><div id="kill-feed" aria-live="polite"></div><div id="countdown" aria-live="assertive"></div>
+       <footer><div className="player-card panel"><div className="portrait"></div><div><div className="name" id="player-class">SHOTGUNNER</div><div className="cube-counter" id="cube-counter">◆ 0 POWER CUBES</div><div className="role"><span id="ammo-status">3 / 3 SHOTS READY</span></div><div className="health"><b id="player-health"></b></div><div className="ammo" id="ammo"><i><b></b></i><i><b></b></i><i><b></b></i></div></div></div><div className="controls"><div className="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div><span>Move</span><div className="control-divider"></div><kbd>↖</kbd><span>Aim / fire</span><div className="control-divider"></div><kbd>P</kbd><span>Pause</span></div><div className="build">CANYON SHOWDOWN<span id="stats">WEBGL · THREE.JS</span></div></footer>
+      </div>
+      <div id="modal"><div className="modal-card panel"><div className="eyebrow">TAKE A BREATHER</div><h2>Arena paused.</h2><p>The desert can wait.<br />Press P or jump back in below.</p><div className="settings"><label><input type="checkbox" id="reduce-shake" /> Reduce camera shake</label><label>Master volume <input type="range" id="master-volume" min="0" max="100" defaultValue="60" /></label><label>SFX volume <input type="range" id="sfx-volume" min="0" max="100" defaultValue="80" /></label><p>Low: 300 particles, no shadows, prop outlines or decals.<br />Medium: 500 particles, 1024 shadows.<br />High: 800 particles, 2048 shadows, all effects.</p></div><button className="primary" id="resume">Back to the arena →</button></div></div>
+      <div id="lobby" className="screen" data-step="menu"><div className="lobby-card panel"><div className="eyebrow">DUSTUP / SOLO SHOWDOWN</div><h2>Choose your<br /><span>kind of trouble.</span></h2><p>Break boxes. Collect power. Stay inside the line.<br />Seven rivals. One shrinking arena.</p><button id="choose" className="primary">Choose your brawler →</button><div className="select-content"><div id="roster" className="roster" role="group" aria-label="Choose your brawler"></div><div id="stat-bars"></div><p id="class-description"></p><label className="seed-label">ARENA SEED <input id="seed-input" aria-label="Arena seed" type="number" min="0" max="4294967295" defaultValue="8241" /><button id="apply-seed" type="button">Generate</button></label><div className="difficulty" role="group" aria-label="Bot difficulty"><button data-difficulty="easy" aria-pressed="false">Easy</button><button data-difficulty="normal" className="selected" aria-pressed="true">Normal</button><button data-difficulty="hard" aria-pressed="false">Hard</button></div><p id="difficulty-description">Balanced rivals with steady aim and a taste for a fight.</p><button id="start" className="primary">Enter the arena →</button></div><div className="lobby-note">DESKTOP & TOUCH · GAS CLOSES IN AFTER 26 SECONDS</div><div className="lobby-note">WASD move · Mouse aim · P pause · M mute<br />Touch: left stick moves · right stick aims; tap to auto-aim</div></div></div>
+      <div id="result" className="screen" hidden><div className="lobby-card panel"><div className="eyebrow" id="result-eyebrow">MATCH COMPLETE</div><h2 id="result-title">Showdown over.</h2><div id="result-rank"></div><p id="result-summary"></p><div className="result-stats"><div><b id="result-kills">0</b><span>KILLS</span></div><div><b id="result-cubes">0</b><span>CUBES</span></div><div><b id="result-damage">0</b><span>DAMAGE</span></div></div><p id="result-cause"></p><button className="primary" id="again">Play again →</button><button className="secondary" id="spectate">Spectate remaining brawlers</button><button className="secondary" id="back-menu">Change brawler / difficulty</button></div></div>
+      <div id="error"></div>
+    </>
+  );
+}
